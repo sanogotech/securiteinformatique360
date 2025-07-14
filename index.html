@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audit de Cybersécurité - Outil d'Évaluation</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #34495e;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: var(--dark-color);
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 4rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .card-domain {
+            transition: all 0.3s ease;
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .card-domain:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+        
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            border-bottom: none;
+        }
+        
+        .form-check-input:checked {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+        }
+        
+        .btn-primary {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: #2980b9;
+            border-color: #2980b9;
+        }
+        
+        .progress {
+            height: 25px;
+            border-radius: 12px;
+        }
+        
+        .progress-bar {
+            background-color: var(--secondary-color);
+        }
+        
+        .maturity-level {
+            border-left: 5px solid var(--secondary-color);
+            padding-left: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .recommendation-card {
+            border-left: 4px solid var(--success-color);
+            margin-bottom: 15px;
+        }
+        
+        .rating-stars {
+            color: var(--warning-color);
+            font-size: 1.5rem;
+        }
+        
+        .result-section {
+            background-color: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .domain-score {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            margin: 0 auto;
+        }
+        
+        .score-0 { background-color: #e74c3c; }
+        .score-1 { background-color: #e67e22; }
+        .score-2 { background-color: #f39c12; }
+        .score-3 { background-color: #f1c40f; }
+        .score-4 { background-color: #2ecc71; }
+        .score-5 { background-color: #27ae60; }
+        
+        .tooltip-inner {
+            max-width: 300px;
+            padding: 10px;
+        }
+        
+        .accordion-button:focus {
+            box-shadow: none;
+        }
+        
+        .roadmap-item {
+            position: relative;
+            padding-left: 30px;
+            margin-bottom: 15px;
+        }
+        
+        .roadmap-item:before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 5px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: var(--secondary-color);
+        }
+        
+        .roadmap-item:after {
+            content: "";
+            position: absolute;
+            left: 9px;
+            top: 25px;
+            width: 2px;
+            height: calc(100% - 20px);
+            background-color: var(--secondary-color);
+        }
+        
+        .roadmap-item:last-child:after {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 2rem 0;
+            }
+            
+            .card-domain {
+                margin-bottom: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-shield-alt me-2"></i>CyberAudit Pro
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#audit">Audit</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#results">Résultats</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#recommendations">Recommandations</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container text-center">
+            <h1 class="display-4 fw-bold mb-4">Audit de Cybersécurité</h1>
+            <p class="lead mb-4">Évaluez la maturité cybersécurité de votre entreprise et obtenez un plan d'action personnalisé</p>
+            <div class="d-flex justify-content-center gap-3">
+                <button id="start-audit-btn" class="btn btn-light btn-lg px-4">
+                    <i class="fas fa-play me-2"></i>Commencer l'audit
+                </button>
+                <button class="btn btn-outline-light btn-lg px-4" data-bs-toggle="modal" data-bs-target="#instructionsModal">
+                    <i class="fas fa-info-circle me-2"></i>Instructions
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Instructions Modal -->
+    <div class="modal fade" id="instructionsModal" tabindex="-1" aria-labelledby="instructionsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="instructionsModalLabel">Instructions pour l'audit</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h5>Comment utiliser cet outil d'audit :</h5>
+                    <ol>
+                        <li class="mb-2">Répondez à toutes les questions pour chaque domaine de cybersécurité (10 domaines au total).</li>
+                        <li class="mb-2">Pour chaque bonne pratique, évaluez son niveau d'implémentation dans votre organisation :</li>
+                        <ul>
+                            <li><strong>0 - Non implémenté</strong> : Absence totale de mise en œuvre</li>
+                            <li><strong>1 - Planifié</strong> : En cours de planification mais pas encore implémenté</li>
+                            <li><strong>2 - Partiel</strong> : Implémentation partielle ou sur certains systèmes seulement</li>
+                            <li><strong>3 - Implémenté</strong> : Mis en œuvre mais sans processus formalisé</li>
+                            <li><strong>4 - Optimisé</strong> : Mis en œuvre avec processus formalisé et mesuré</li>
+                            <li><strong>5 - Exemplaire</strong> : Bonne pratique mature, améliorée en continu et intégrée à la culture</li>
+                        </ul>
+                        <li class="mb-2">Après avoir complété tous les domaines, consultez vos résultats et recommandations.</li>
+                        <li>Exportez votre rapport pour partager avec votre équipe ou l'utiliser comme feuille de route.</li>
+                    </ol>
+                    <div class="alert alert-info mt-4">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        <strong>Conseil :</strong> Soyez aussi objectif que possible dans vos réponses. Si vous n'êtes pas sûr, consultez les responsables concernés avant de répondre.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Compris</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audit Form -->
+    <div class="container my-5" id="audit">
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h3 class="card-title mb-4"><i class="fas fa-building me-2"></i>Informations sur l'entreprise</h3>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="company-name" class="form-label">Nom de l'entreprise</label>
+                                <input type="text" class="form-control" id="company-name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="company-sector" class="form-label">Secteur d'activité</label>
+                                <select class="form-select" id="company-sector">
+                                    <option value="finance">Finance/Banque/Assurance</option>
+                                    <option value="sante">Santé</option>
+                                    <option value="industrie">Industrie</option>
+                                    <option value="tech">Technologie</option>
+                                    <option value="commerce">Commerce</option>
+                                    <option value="services">Services</option>
+                                    <option value="public">Secteur Public</option>
+                                    <option value="autre">Autre</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="company-size" class="form-label">Taille de l'entreprise</label>
+                                <select class="form-select" id="company-size">
+                                    <option value="micro">Micro-entreprise (1-9 employés)</option>
+                                    <option value="petite">Petite entreprise (10-49 employés)</option>
+                                    <option value="moyenne">Moyenne entreprise (50-249 employés)</option>
+                                    <option value="grande">Grande entreprise (250+ employés)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="auditor-name" class="form-label">Nom de l'auditeur</label>
+                                <input type="text" class="form-control" id="auditor-name" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Domaines d'audit -->
+        <div id="audit-domains">
+            <!-- Domaine 1: IAM -->
+            <div class="card card-domain mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-user-shield me-2"></i>1. IAM - Gestion des Identités et Accès</span>
+                    <span class="badge bg-secondary">10 bonnes pratiques</span>
+                </div>
+                <div class="card-body">
+                    <p class="card-text mb-4">Évaluez la gestion des identités et des accès dans votre organisation selon ces bonnes pratiques.</p>
+                    
+                    <div class="practice-container">
+                        <div class="practice-item mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">1. Appliquer le principe du moindre privilège</h6>
+                                <span class="badge bg-info text-dark" data-bs-toggle="tooltip" data-bs-placement="top" title="Les utilisateurs ne devraient avoir que les accès strictement nécessaires à leur fonction">?</span>
+                            </div>
+                            <select class="form-select practice-score" data-domain="iam" data-practice="1">
+                                <option value="0">0 - Non implémenté</option>
+                                <option value="1">1 - Planifié</option>
+                                <option value="2">2 - Partiel</option>
+                                <option value="3">3 - Implémenté</option>
+                                <option value="4">4 - Optimisé</option>
+                                <option value="5">5 - Exemplaire</option>
+                            </select>
+                        </div>
+                        
+                        <div class="practice-item mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">2. Définir des rôles métiers</h6>
+                                <span class="badge bg-info text-dark" data-bs-toggle="tooltip" data-bs-placement="top" title="Les accès sont définis par rôles métiers plutôt que individuellement">?</span>
+                            </div>
+                            <select class="form-select practice-score" data-domain="iam" data-practice="2">
+                                <option value="0">0 - Non implémenté</option>
+                                <option value="1">1 - Planifié</option>
+                                <option value="2">2 - Partiel</option>
+                                <option value="3">3 - Implémenté</option>
+                                <option value="4">4 - Optimisé</option>
+                                <option value="5">5 - Exemplaire</option>
+                            </select>
+                        </div>
+                        
+                        <div class="practice-item mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">3. Gérer les comptes à privilèges (PAM)</h6>
+                                <span class="badge bg-info text-dark" data-bs-toggle="tooltip" data-bs-placement="top" title="Les comptes administrateurs sont gérés avec des contrôles stricts">?</span>
+                            </div>
+                            <select class="form-select practice-score" data-domain="iam" data-practice="3">
+                                <option value="0">0 - Non implémenté</option>
+                                <option value="1">1 - Planifié</option>
+                                <option value="2">2 - Partiel</option>
+                                <option value="3">3 - Implémenté</option>
+                                <option value="4">4 - Optimisé</option>
+                                <option value="5">5 - Exemplaire</option>
+                            </select>
+                        </div>
+                        
+                        <div class="practice-item mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">4. Supprimer les comptes inactifs</h6>
+                                <span class="badge bg-info text-dark" data-bs-toggle="tooltip" data-bs-placement="top" title="Les comptes non utilisés depuis plus de 90 jours sont désactivés">?</span>
+                            </div>
+                            <select class="form-select practice-score" data-domain="iam" data-practice="4">
+                                <option value="0">0 - Non implémenté</option>
+                                <option value="1">1 - Planifié</option>
+                                <option value="2">2 - Partiel</option>
+                                <option value="3">3 - Implémenté</option>
+                                <option value="4">4 - Optimisé</option>
+                                <option value="5">5 - Exemplaire</option>
+                            </select>
+                        </div>
+                        
+                        <div class="practice-item mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">5. Utiliser le SSO sécurisé</h6>
+                                <span class="badge bg-info text-dark" data-bs-toggle="tooltip" data-bs-placement="top" title="Authentification unique sécurisée pour les applications">?</span>
+                            </div>
+                            <select class="form-select practice-score" data-domain="iam" data-practice="5">
+                                <option value="0">0 - Non implémenté</option>
+                                <option value="1">1 - Planifié</option>
+                                <option value="2">2 - Partiel</option>
+                                <option value="3">3 - Implémenté</option>
+                                <option value="4">4 - Optimisé</option>
+                                <option value="5">5 - Exemplaire</option>
+                            </select>
+                        </div>
+                        
+                        <div class="practice-item mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">6. Centraliser la gestion des identités (IdP)</h6>
+                                <span class="badge bg-info text-dark" data-bs-toggle="tooltip" data-bs-placement="top" title="Solution centralisée pour la gestion des identités">?</span>
+                            </div>
+                            <select class="form-select practice-score" data-domain="iam" data-practice="6">
+                                <option value="0">0 - Non implémenté</option>
+                                <option value="1">1 - Planifié</option>
+                                <option value="2">2 - Partiel</option>
+                                <option value="3">3 - Implémenté</option>
+                                <option value="4">4 - Optimisé</option>
+                                <option value="5">5 - Exemplaire</option>
+                            </select>
+                        </div>
+                        
+                        <div class="practice-item mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">7. Journaliser tous les accès</h6>
+                                <span class="badge bg-info text-dark" data-bs-toggle="tooltip" data-bs-placement="top" title="Tous les accès sont enregistrés pour audit et analyse">?</span>
+                            </div>
+                            <select class="form-select practice-score" data-domain="iam" data-practice="7">
+                                <option value="0">0 - Non implémenté</option>
+                                <option value="1">1 - Planifié</option>
+                                <option value="2">2 - Partiel</option>
+                                <option value="3">3 - Implémenté</option>
+                                <option value="4">4 - Optimisé</option>
+                                <option value="5">5 - Exemplaire</option>
+                            </select>
+                        </div>
+                        
+                        <div class="practice-item mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">8. Auditer les droits trimestriellement</h6>
+                                <span class="badge bg-info text-dark" data-bs-toggle="tooltip" data-bs-placement="top" title="Revue régulière des droits d'accès">?</span>
+                            </div>
+                            <select class="form-select practice-score" data-domain="iam" data-practice="8">
+                                <option value="0">0 - Non implémenté</option>
+                                <option value="1">1 - Planifié</option>
+                                <option value="2">2 - Partiel</option>
+                                <option value="3">3 - Implémenté</option>
+                                <option value="4">4 - Optimisé</option>
+                                <option value="5">5 - Exemplaire</option>
+                            </select>
+                        </div>
+                        
+                        <div class="practice-item mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">9. Expiration automatique des droits temporaires</h6>
+                                <span class="badge bg-info text-dark" data-bs-toggle="tooltip" data-bs-placement="top" title="Les accès temporaires expirent automatiquement">?</span>
+                            </div>
+                            <select class="form-select practice-score" data-domain="iam" data-practice="9">
+                                <option value="0">0 - Non implémenté</option>
+                                <option value="1">1 - Planifié</option>
+                                <option value="2">2 - Partiel</option>
+                                <option value="3">3 - Implémenté</option>
+                                <option value="4">4 - Optimisé</option>
+                                <option value="5">5 - Exemplaire</option>
+                            </select>
+                        </div>
+                        
+                        <div class="practice-item mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">10. Bloquer les comptes après plusieurs échecs de connexion</h6>
+                                <span class="badge bg-info text-dark" data-bs-toggle="tooltip" data-bs-placement="top" title="Protection contre les attaques par force brute">?</span>
+                            </div>
+                            <select class="form-select practice-score" data-domain="iam" data-practice="10">
+                                <option value="0">0 - Non implémenté</option>
+                                <option value="1">1 - Planifié</option>
+                                <option value="2">2 - Partiel</option>
+                                <option value="3">3 - Implémenté</option>
+                                <option value="4">4 - Optimisé</option>
+                                <option value="5">5 - Exemplaire</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Domaine 2: MFA -->
+            <div class="card card-domain mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-lock me-2"></i>2. MFA - Authentification Multi-Facteurs</span>
+                    <span class="badge bg-secondary">10 bonnes pratiques</span>
+                </div>
+                <div class="card-body">
+                    <p class="card-text mb-4">Évaluez l'implémentation de l'authentification multi-facteurs dans votre organisation.</p>
+                    
+                    <div class="practice-container">
+                        <div class="practice-item mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">11. Activer le MFA sur tous les accès sensibles</h6>
+                                <span class="badge bg-info text-dark" data-bs-toggle="tooltip" data-bs-placement="top" title="MFA obligatoire pour les accès critiques">?</span>
+                            </div>
+                            <select class="form-select practice-score" data-domain="mfa" data-practice="1">
+                                <option value="0">0 - Non implémenté</option>
+                                <option value="1">1 - Planifié</option>
+                                <option value="2">2 - Partiel</option>
+                                <option value="3">3 - Implémenté</option>
+                                <option value="4">4 - Optimisé</option>
+                                <option value="5">5 - Exemplaire</option>
+                            </select>
+                        </div>
+                        
+                        <div class="practice-item mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">12. Éviter les MFA par SMS</h6>
+                                <span class="badge bg-info text-dark" data-bs-toggle="tooltip" data-bs-placement="top" title="Préférer des méthodes plus sécurisées que le SMS">?</span>
+                            </div>
+                            <select class="form-select practice-score" data-domain="mfa" data-practice="2">
+                                <option value="0">0 - Non implémenté</option>
+                                <option value="1">1 - Planifié</option>
+                                <option value="2">2 - Partiel</option>
+                                <option value="3">3 - Implémenté</option>
+                                <option value="4">4 - Optimisé</option>
+                                <option value="5">5 - Exemplaire</option>
+                            </select>
+                        </div>
+                        
+                        <div class="practice-item mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">13. Préférer les tokens TOTP</h6>
+                                <span class="badge bg-info text-dark" data-bs-toggle="tooltip" data-bs-placement="top" title="Tokens basés sur le temps plutôt que SMS">?</span>
+                            </div>
+                            <select class="form-select practice-score" data-domain="mfa" data-practice="3">
+                                <option value="0">0 - Non implémenté</option>
+                                <option value="1">1 - Planifié</option>
+                                <option value="2">2 - Partiel</option>
+                                <option value="3">3 - Implémenté</option>
+                                <option value="4">4 - Optimisé</option>
+                                <option value="5">5 - Exemplaire</option>
+                            </select>
+                        </div>
+                        
+                        <div class="practice-item mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">14. Sensibiliser au phishing ciblé de MFA</h6>
+                                <span class="badge bg-info text-dark" data-bs-toggle="tooltip" data-bs-placement="top" title="Former les utilisateurs aux attaques ciblant le MFA">?</span>
+                            </div>
+                            <select class="form-select practice-score" data-domain="mfa" data-practice="4">
+                                <option value="0">0 - Non implémenté</option>
+                                <option value="1">1 - Planifié</option>
+                                <option value="2">2 - Partiel</option>
+                                <option value="3">3 - Implémenté</option>
+                                <option value="4">4 - Optimisé</option>
+                                <option value="5">5 - Exemplaire</option>
+                            </select>
+                        </div>
+                        
+                        <div class="practice-item mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">15. Utiliser des solutions adaptatives de MFA</h6>
+                                <span class="badge bg-info text-dark" data-bs-toggle="tooltip" data-bs-placement="top" title="MFA contextuel basé sur le risque">?</span>
+                            </div>
+                            <select class="form-select practice-score" data-domain="mfa" data-practice="5">
+                                <option value="0">0 - Non implémenté</option>
+                                <option value="1">1 - Planifié</option>
+                                <option value="2">2 - Partiel</option>
+                                <option value="3">3 - Implémenté</option>
+                                <option value="4">4 - Optimisé</option>
+                                <option value="5">5 - Exemplaire</option>
+                            </select>
+                        </div>
+                        
+                        <div class="practice-item mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">16. Activer le MFA pour les administrateurs</h6>
+                                <span class="badge bg-info text-dark" data-bs-toggle="tooltip" data-bs-placement="top" title="MFA obligatoire pour tous les comptes admin">?</span>
+                            </div>
+                            <select class="form-select practice-score" data-domain="mfa" data-practice="6">
+                                <option value="0">0 - Non implémenté</option>
+                                <option value="1">1 - Planifié</option>
+                                <option value="2">2 - Partiel</option>
+                                <option value="3">3 - Implémenté</option>
+                                <option value="4">4 - Optimisé</option>
+                                <option value="5">5 - Exemplaire</option>
+                            </select>
+                        </div>
+                        
+                        <div class="practice-item mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">17. Vérifier l'intégration MFA sur VPN, messagerie, cloud</h6>
+                                <span class="badge bg-info text-dark" data-bs-toggle="tooltip" data-bs-placement="top" title="MFA activé sur tous les accès externes critiques">?</span>
+                            </div>
+                            <select class="form-select practice-score" data-domain="mfa" data-practice="7">
+                                <option value="0">0 - Non implémenté</option>
+                                <option value="1">1 - Planifié</option>
+                                <option value="2">2 - Partiel</option>
+                                <option value="3">3 - Implémenté</option>
+                                <option value="4">4 - Optimisé</option>
+                                <option value="5">5 - Exemplaire</option>
+                            </select>
+                        </div>
+                        
+                        <div class="practice-item mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">18. Mettre des alertes en cas de désactivation MFA</h6>
+                                <span class="badge bg-info text-dark" data-bs-toggle="tooltip" data-bs-placement="top" title="Surveillance des désactivations de MFA">?</span>
+                            </div>
+                            <select class="form-select practice-score" data-domain="mfa" data-practice="8">
+                                <option value="0">0 - Non implémenté</option>
+                                <option value="1">1 - Planifié</option>
+                                <option value="2">2 - Partiel</option>
+                                <option value="3">3 - Implémenté</option>
+                                <option value="4">4 - Optimisé</option>
+                                <option value="5">5 - Exemplaire</option>
+                            </select>
+                        </div>
+                        
+                        <div class="practice-item mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">19. Forcer la réauthentification régulière</h6>
+                                <span class="badge bg-info text-dark" data-bs-toggle="tooltip" data-bs-placement="top" title="Nécessité de se réauthentifier périodiquement">?</span>
+                            </div>
+                            <select class="form-select practice-score" data-domain="mfa" data-practice="9">
+                                <option value="0">0 - Non implémenté</option>
+                                <option value="1">1 - Planifié</option>
+                                <option value="2">2 - Partiel</option>
+                                <option value="3">3 - Implémenté</option>
+                                <option value="4">4 - Optimisé</option>
+                                <option value="5">5 - Exemplaire</option>
+                            </select>
+                        </div>
+                        
+                        <div class="practice-item mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">20. Intégrer MFA à l'authentification biométrique</h6>
+                                <span class="badge bg-info text-dark" data-bs-toggle="tooltip" data-bs-placement="top" title="Combinaison de MFA avec biométrie pour haute sécurité">?</span>
+                            </div>
+                            <select class="form-select practice-score" data-domain="mfa" data-practice="10">
+                                <option value="0">0 - Non implémenté</option>
+                                <option value="1">1 - Planifié</option>
+                                <option value="2">2 - Partiel</option>
+                                <option value="3">3 - Implémenté</option>
+                                <option value="4">4 - Optimisé</option>
+                                <option value="5">5 - Exemplaire</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Les autres domaines suivent le même modèle -->
+            <!-- Pour des raisons de concision, nous n'affichons que 2 domaines complets dans cet exemple -->
+            <!-- Dans une implémentation réelle, tous les 10 domaines seraient inclus -->
+            
+            <!-- Bandeau pour indiquer qu'il y a plus de domaines -->
+            <div class="card mb-4 bg-light">
+                <div class="card-body text-center">
+                    <h5 class="card-title">8 autres domaines à évaluer</h5>
+                    <p class="card-text">WAF & Firewalls, Gestion des vulnérabilités, Endpoint Protection, Zero Trust, DevSecOps, Sécurité des applications, OS Hardening, Sensibilisation</p>
+                    <button class="btn btn-primary" id="show-all-domains">Voir tous les domaines</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bouton de soumission -->
+        <div class="text-center my-5">
+            <button class="btn btn-primary btn-lg px-5" id="calculate-results">
+                <i class="fas fa-chart-bar me-2"></i>Calculer les résultats
+            </button>
+        </div>
+    </div>
+
+    <!-- Résultats Section -->
+    <div class="container my-5 d-none" id="results">
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="result-section">
+                    <h2 class="text-center mb-4"><i class="fas fa-chart-pie me-2"></i>Résultats de l'audit</h2>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card mb-4">
+                                <div class="card-header bg-primary text-white">
+                                    <h5 class="mb-0">Résumé global</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h6 class="mb-0">Score global</h6>
+                                        <span class="display-6 fw-bold" id="global-score">0</span>
+                                    </div>
+                                    <div class="progress mb-3">
+                                        <div class="progress-bar" id="global-progress" role="progressbar" style="width: 0%"></div>
+                                    </div>
+                                    <div class="maturity-level">
+                                        <h6>Niveau de maturité :</h6>
+                                        <p class="fw-bold" id="maturity-level">Non évalué</p>
+                                        <p id="maturity-description">Complétez l'audit pour voir votre niveau de maturité</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-primary text-white">
+                                    <h5 class="mb-0">Détails par domaine</h5>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="radar-chart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive mb-4">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Domaine</th>
+                                    <th>Score</th>
+                                    <th>Progression</th>
+                                    <th>Évaluation</th>
+                                </tr>
+                            </thead>
+                            <tbody id="domain-scores-table">
+                                <!-- Rempli dynamiquement -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="text-center">
+                        <button class="btn btn-primary me-2" id="generate-report">
+                            <i class="fas fa-file-pdf me-2"></i>Générer un rapport PDF
+                        </button>
+                        <button class="btn btn-outline-primary" id="view-recommendations">
+                            <i class="fas fa-lightbulb me-2"></i>Voir les recommandations
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recommandations Section -->
+    <div class="container my-5 d-none" id="recommendations">
+        <div class="row">
+            <div class="col-12">
+                <div class="result-section">
+                    <h2 class="text-center mb-4"><i class="fas fa-lightbulb me-2"></i>Recommandations et feuille de route</h2>
+                    
+                    <div class="alert alert-info mb-4">
+                        <h5><i class="fas fa-info-circle me-2"></i>Points forts et faibles</h5>
+                        <p id="strengths-weaknesses">Analyse en cours...</p>
+                    </div>
+                    
+                    <h4 class="mb-3"><i class="fas fa-tasks me-2"></i>Priorités d'amélioration</h4>
+                    <div class="row" id="priority-recommendations">
+                        <!-- Rempli dynamiquement -->
+                    </div>
+                    
+                    <h4 class="mt-5 mb-3"><i class="fas fa-road me-2"></i>Feuille de route</h4>
+                    <div class="accordion mb-4" id="roadmap-accordion">
+                        <!-- Rempli dynamiquement -->
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <button class="btn btn-primary me-2" id="export-roadmap">
+                            <i class="fas fa-download me-2"></i>Exporter la feuille de route
+                        </button>
+                        <button class="btn btn-outline-secondary" id="back-to-results">
+                            <i class="fas fa-arrow-left me-2"></i>Retour aux résultats
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="fas fa-shield-alt me-2"></i>CyberAudit Pro</h5>
+                    <p class="mb-0">Outil d'évaluation de la maturité cybersécurité pour les entreprises.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0">&copy; 2023 Tous droits réservés.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+        // Initialisation des tooltips Bootstrap
+        document.addEventListener('DOMContentLoaded', function() {
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+            
+            // Gestion des événements
+            document.getElementById('start-audit-btn').addEventListener('click', function() {
+                document.getElementById('audit').scrollIntoView({ behavior: 'smooth' });
+            });
+            
+            document.getElementById('calculate-results').addEventListener('click', calculateResults);
+            document.getElementById('view-recommendations').addEventListener('click', showRecommendations);
+            document.getElementById('back-to-results').addEventListener('click', backToResults);
+            document.getElementById('generate-report').addEventListener('click', generatePDFReport);
+            document.getElementById('export-roadmap').addEventListener('click', exportRoadmap);
+        });
+        
+        // Données des domaines et bonnes pratiques
+        const domains = [
+            { id: 'iam', name: 'IAM', practices: 10, description: 'Gestion des Identités et Accès' },
+            { id: 'mfa', name: 'MFA', practices: 10, description: 'Authentification Multi-Facteurs' },
+            { id: 'waf', name: 'WAF & Firewalls', practices: 10, description: 'Protection périmétrique' },
+            { id: 'vuln', name: 'Gestion des vulnérabilités', practices: 10, description: 'Patch Management' },
+            { id: 'endpoint', name: 'Endpoint Protection', practices: 10, description: 'Protection des postes' },
+            { id: 'zerotrust', name: 'Zero Trust', practices: 10, description: 'Security by Design' },
+            { id: 'devsecops', name: 'DevSecOps', practices: 10, description: 'Sécurité DevOps' },
+            { id: 'appsec', name: 'Sécurité des applications', practices: 10, description: 'Applications sécurisées' },
+            { id: 'hardening', name: 'OS Hardening', practices: 10, description: 'Renforcement des systèmes' },
+            { id: 'awareness', name: 'Sensibilisation', practices: 10, description: 'Culture sécurité' }
+        ];
+        
+        // Calcul des résultats
+        function calculateResults() {
+            // Valider que toutes les questions ont été répondues
+            const unanswered = document.querySelectorAll('.practice-score:invalid');
+            if (unanswered.length > 0) {
+                alert('Veuillez répondre à toutes les questions avant de calculer les résultats.');
+                unanswered[0].focus();
+                return;
+            }
+            
+            // Calculer les scores par domaine
+            const domainScores = {};
+            let totalScore = 0;
+            let maxPossibleScore = 0;
+            
+            domains.forEach(domain => {
+                const scores = [];
+                const practiceSelects = document.querySelectorAll(`.practice-score[data-domain="${domain.id}"]`);
+                
+                practiceSelects.forEach(select => {
+                    const score = parseInt(select.value);
+                    scores.push(score);
+                });
+                
+                const domainTotal = scores.reduce((a, b) => a + b, 0);
+                const domainMax = domain.practices * 5;
+                const domainPercentage = Math.round((domainTotal / domainMax) * 100);
+                
+                domainScores[domain.id] = {
+                    total: domainTotal,
+                    max: domainMax,
+                    percentage: domainPercentage,
+                    average: (domainTotal / domain.practices).toFixed(1)
+                };
+                
+                totalScore += domainTotal;
+                maxPossibleScore += domainMax;
+            });
+            
+            // Calculer le score global
+            const globalPercentage = Math.round((totalScore / maxPossibleScore) * 100);
+            const globalAverage = (totalScore / (maxPossibleScore / 5)).toFixed(1);
+            
+            // Afficher les résultats
+            document.getElementById('global-score').textContent = globalAverage + '/5';
+            document.getElementById('global-progress').style.width = globalPercentage + '%';
+            document.getElementById('global-progress').setAttribute('aria-valuenow', globalPercentage);
+            
+            // Déterminer le niveau de maturité
+            const maturity = getMaturityLevel(globalPercentage);
+            document.getElementById('maturity-level').textContent = maturity.level;
+            document.getElementById('maturity-level').className = 'fw-bold text-' + maturity.color;
+            document.getElementById('maturity-description').textContent = maturity.description;
+            
+            // Remplir le tableau des scores par domaine
+            const tableBody = document.getElementById('domain-scores-table');
+            tableBody.innerHTML = '';
+            
+            domains.forEach(domain => {
+                const score = domainScores[domain.id];
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td><strong>${domain.name}</strong><br><small>${domain.description}</small></td>
+                    <td class="text-center fw-bold">${score.average}/5</td>
+                    <td>
+                        <div class="progress">
+                            <div class="progress-bar bg-${getScoreColor(score.average)}" role="progressbar" style="width: ${score.percentage}%"></div>
+                        </div>
+                    </td>
+                    <td class="text-${getScoreColor(score.average)}"><strong>${getScoreEvaluation(score.average)}</strong></td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+            
+            // Générer le radar chart
+            generateRadarChart(domainScores);
+            
+            // Afficher la section des résultats
+            document.getElementById('results').classList.remove('d-none');
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+            
+            // Préparer les recommandations
+            prepareRecommendations(domainScores, globalAverage);
+        }
+        
+        // Niveaux de maturité
+        function getMaturityLevel(percentage) {
+            if (percentage >= 90) return { 
+                level: 'Exemplaire', 
+                color: 'success',
+                description: 'Votre organisation démontre une excellence en cybersécurité avec des processus matures et continuellement améliorés.'
+            };
+            if (percentage >= 75) return { 
+                level: 'Avancé', 
+                color: 'primary',
+                description: 'Une posture de sécurité solide avec des processus bien établis et mesurés. Quelques améliorations possibles.'
+            };
+            if (percentage >= 60) return { 
+                level: 'Intermediaire', 
+                color: 'info',
+                description: 'Des mesures de sécurité de base sont en place mais nécessitent plus de formalisation et de couverture.'
+            };
+            if (percentage >= 40) return { 
+                level: 'Elementaire', 
+                color: 'warning',
+                description: 'Début de mise en œuvre des contrôles de sécurité mais avec des lacunes importantes à combler.'
+            };
+            return { 
+                level: 'Initial', 
+                color: 'danger',
+                description: 'Peu ou pas de processus de sécurité formalisés. Risque cybersécurité élevé pour l\'organisation.'
+            };
+        }
+        
+        // Couleur en fonction du score
+        function getScoreColor(score) {
+            score = parseFloat(score);
+            if (score >= 4.5) return 'success';
+            if (score >= 3.5) return 'primary';
+            if (score >= 2.5) return 'info';
+            if (score >= 1.5) return 'warning';
+            return 'danger';
+        }
+        
+        // Évaluation textuelle du score
+        function getScoreEvaluation(score) {
+            score = parseFloat(score);
+            if (score >= 4.5) return 'Excellent';
+            if (score >= 3.5) return 'Bon';
+            if (score >= 2.5) return 'Moyen';
+            if (score >= 1.5) return 'Faible';
+            return 'Critique';
+        }
+        
+        // Générer le radar chart
+        function generateRadarChart(domainScores) {
+            const ctx = document.getElementById('radar-chart').getContext('2d');
+            
+            if (window.radarChart) {
+                window.radarChart.destroy();
+            }
+            
+            const labels = domains.map(d => d.name);
+            const data = domains.map(d => domainScores[d.id].average);
+            
+            window.radarChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Score par domaine',
+                        data: data,
+                        backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                        borderColor: 'rgba(52, 152, 219, 1)',
+                        pointBackgroundColor: 'rgba(52, 152, 219, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(52, 152, 219, 1)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    scales: {
+                        r: {
+                            angleLines: {
+                                display: true
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 5,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Préparer les recommandations
+        function prepareRecommendations(domainScores, globalAverage) {
+            // Trouver les 3 domaines les plus faibles
+            const weakDomains = [...domains]
+                .sort((a, b) => domainScores[a.id].average - domainScores[b.id].average)
+                .slice(0, 3);
+            
+            // Générer les recommandations prioritaires
+            const priorityContainer = document.getElementById('priority-recommendations');
+            priorityContainer.innerHTML = '';
+            
+            weakDomains.forEach((domain, index) => {
+                const recommendations = getDomainRecommendations(domain.id);
+                const card = document.createElement('div');
+                card.className = 'col-md-4 mb-3';
+                
+                card.innerHTML = `
+                    <div class="card h-100 border-${getScoreColor(domainScores[domain.id].average)}">
+                        <div class="card-header bg-${getScoreColor(domainScores[domain.id].average)} text-white">
+                            <h5 class="mb-0">Priorité ${index + 1}: ${domain.name}</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">Score: <strong>${domainScores[domain.id].average}/5</strong></p>
+                            <h6>Recommandations:</h6>
+                            <ul class="mb-0">
+                                ${recommendations.slice(0, 3).map(r => `<li>${r}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                `;
+                
+                priorityContainer.appendChild(card);
+            });
+            
+            // Générer la feuille de route complète
+            const roadmapAccordion = document.getElementById('roadmap-accordion');
+            roadmapAccordion.innerHTML = '';
+            
+            domains.forEach((domain, index) => {
+                const recommendations = getDomainRecommendations(domain.id);
+                const accordionItem = document.createElement('div');
+                accordionItem.className = 'accordion-item';
+                
+                accordionItem.innerHTML = `
+                    <h2 class="accordion-header" id="heading${index}">
+                        <button class="accordion-button ${index === 0 ? '' : 'collapsed'}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${index}">
+                            <span class="badge bg-${getScoreColor(domainScores[domain.id].average)} me-2">${domainScores[domain.id].average}/5</span>
+                            ${domain.name} - ${domain.description}
+                        </button>
+                    </h2>
+                    <div id="collapse${index}" class="accordion-collapse collapse ${index === 0 ? 'show' : ''}" data-bs-parent="#roadmap-accordion">
+                        <div class="accordion-body">
+                            <div class="roadmap-item">
+                                <h5>Objectif d'amélioration</h5>
+                                <p>Passer de ${domainScores[domain.id].average}/5 à ${(parseFloat(domainScores[domain.id].average) + 1).toFixed(1)}/5 dans les 6 prochains mois</p>
+                            </div>
+                            <div class="roadmap-item">
+                                <h5>Actions recommandées</h5>
+                                <ul>
+                                    ${recommendations.map(r => `<li>${r}</li>`).join('')}
+                                </ul>
+                            </div>
+                            <div class="roadmap-item">
+                                <h5>Indicateurs de succès</h5>
+                                <ul>
+                                    <li>Mise en œuvre d'au moins 3 des recommandations ci-dessus</li>
+                                    <li>Amélioration du score dans le prochain audit</li>
+                                    <li>Réduction des incidents liés à ce domaine</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                roadmapAccordion.appendChild(accordionItem);
+            });
+            
+            // Générer l'analyse des forces/faiblesses
+            const strengths = [...domains]
+                .sort((a, b) => domainScores[b.id].average - domainScores[a.id].average)
+                .slice(0, 3);
+            
+            const weaknesses = [...domains]
+                .sort((a, b) => domainScores[a.id].average - domainScores[b.id].average)
+                .slice(0, 3);
+            
+            let analysis = '<p><strong>Points forts:</strong> ';
+            analysis += strengths.map(d => `${d.name} (${domainScores[d.id].average}/5)`).join(', ');
+            analysis += '</p><p><strong>Points faibles:</strong> ';
+            analysis += weaknesses.map(d => `${d.name} (${domainScores[d.id].average}/5)`).join(', ');
+            analysis += '</p>';
+            
+            if (globalAverage >= 4) {
+                analysis += '<p>Votre organisation montre une excellente maturité cybersécurité. Concentrez-vous sur l\'optimisation continue et la détection avancée des menaces.</p>';
+            } else if (globalAverage >= 3) {
+                analysis += '<p>Votre sécurité est bonne mais peut être améliorée. Priorisez les domaines les plus faibles et formalisez vos processus.</p>';
+            } else {
+                analysis += '<p>Votre organisation présente des risques cybersécurité importants. Une action immédiate est recommandée sur les domaines critiques.</p>';
+            }
+            
+            document.getElementById('strengths-weaknesses').innerHTML = analysis;
+        }
+        
+        // Recommandations par domaine (simplifié pour l'exemple)
+        function getDomainRecommendations(domainId) {
+            const recommendations = {
+                iam: [
+                    "Mettre en place une solution centralisée de gestion des identités (IdP)",
+                    "Implémenter le principe du moindre privilège pour tous les utilisateurs",
+                    "Automatiser la gestion des comptes à privilèges avec une solution PAM",
+                    "Mettre en place des revues trimestrielles des droits d'accès",
+                    "Implémenter une expiration automatique des droits temporaires"
+                ],
+                mfa: [
+                    "Activer le MFA pour tous les accès sensibles (VPN, messagerie, cloud)",
+                    "Remplacer les MFA par SMS par des méthodes plus sécurisées (TOTP, clés hardware)",
+                    "Mettre en place une solution MFA adaptative basée sur le risque",
+                    "Former les utilisateurs aux attaques ciblant le MFA (MFA bombing)",
+                    "Surveiller et alerter sur les désactivations de MFA"
+                ],
+                // Recommandations pour les autres domaines...
+                awareness: [
+                    "Organiser des campagnes de phishing simulé trimestrielles",
+                    "Mettre en place un programme de formation continue en cybersécurité",
+                    "Désigner des ambassadeurs sécurité dans chaque département",
+                    "Intégrer la cybersécurité dans le processus d'onboarding",
+                    "Créer un canal de signalement des incidents ou comportements suspects"
+                ]
+            };
+            
+            return recommendations[domainId] || [
+                "Mettre en place des contrôles de sécurité de base pour ce domaine",
+                "Former le personnel aux bonnes pratiques spécifiques à ce domaine",
+                "Évaluer les risques spécifiques et mettre en place des mesures adaptées"
+            ];
+        }
+        
+        // Afficher les recommandations
+        function showRecommendations() {
+            document.getElementById('results').classList.add('d-none');
+            document.getElementById('recommendations').classList.remove('d-none');
+            document.getElementById('recommendations').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Retour aux résultats
+        function backToResults() {
+            document.getElementById('recommendations').classList.add('d-none');
+            document.getElementById('results').classList.remove('d-none');
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Générer un rapport PDF
+        function generatePDFReport() {
+            alert('Fonctionnalité PDF à implémenter avec une bibliothèque comme jsPDF');
+            // Implémentation réelle utiliserait jsPDF et html2canvas
+        }
+        
+        // Exporter la feuille de route
+        function exportRoadmap() {
+            alert('Export de la feuille de route (CSV ou autre format) à implémenter');
+            // Implémentation réelle générerait un fichier CSV ou autre format
+        }
+    </script>
+</body>
+</html>
